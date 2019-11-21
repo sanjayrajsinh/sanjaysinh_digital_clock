@@ -6,6 +6,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_clock_helper/model.dart';
 import 'package:intl/intl.dart';
 
@@ -103,7 +104,8 @@ class _DigitalClockState extends State<DigitalClock> {
         DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
     final minute = DateFormat('mm').format(_dateTime);
     final seconds = DateFormat('ss').format(_dateTime);
-    final fontSize = MediaQuery.of(context).size.width / 6;
+    final ampm = DateFormat('aaa').format(_dateTime);
+    final fontSize = 70.00;
     final offset = -fontSize / 7;
     final defaultStyle = TextStyle(
       color: colors[_Element.text],
@@ -117,20 +119,76 @@ class _DigitalClockState extends State<DigitalClock> {
         ),
       ],
     );
+    final mediumStyle = TextStyle(
+      color: colors[_Element.text],
+      fontFamily: 'DaysOne',
+      fontSize: fontSize - 30,
+      shadows: [
+        Shadow(
+          blurRadius: 12,
+          color: colors[_Element.shadow],
+          offset: Offset(1, 5),
+        ),
+      ],
+    );
+    final smallStyle = TextStyle(
+      color: colors[_Element.text],
+      fontFamily: 'DaysOne',
+      fontSize: fontSize - 45,
+      shadows: [
+        Shadow(
+          blurRadius: 12,
+          color: colors[_Element.shadow],
+          offset: Offset(1, 5),
+        ),
+      ],
+    );
 
     return Container(
-      height: double.infinity,
-      color: colors[_Element.background],
-      child: DefaultTextStyle(
-        style: defaultStyle,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: <Widget>[
-              Align(alignment:Alignment.center,child: Text(minute)),
-              Text(":"),
-              Align(alignment:Alignment.center,child:Text(seconds)),
-            ],
+      decoration: BoxDecoration(
+        // Box decoration takes a gradient
+        gradient: LinearGradient(
+          // Where the linear gradient begins and ends
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          // Add one stop for each color. Stops should increase from 0 to 1
+          stops: [0.1, 0.5, 0.7, 0.9],
+          colors: [
+            // Colors are easy thanks to Flutter's Colors class.
+            Colors.black,
+            Colors.pink[900],
+            Colors.pink[800],
+            Colors.pink[600],
+          ],
         ),
+      ),
+      height: double.infinity,
+      width: double.infinity,
+      child: Column(
+        children: <Widget>[
+          Container(
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              Text(
+                hour,
+                style: defaultStyle,
+              ),
+              Text(":", style: defaultStyle),
+              Text(
+                minute,
+                style: defaultStyle,
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 10),
+                child: Text(
+                  " " + ampm,
+                  style: mediumStyle,
+                ),
+              )
+            ],
+          )),
+        ],
       ),
     );
   }
