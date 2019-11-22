@@ -11,7 +11,6 @@ dependencies:
   flutter_clock_helper:
     path: ../flutter_clock_helper
   cupertino_icons: ^0.1.2
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -22,9 +21,10 @@ flutter:
     - family: Rightous
       fonts:
         - asset: third_party/Righteous-Regular.ttf
-    - family: RussoOne
-      fonts:
-        - asset: third_party/russoOne-regular.ttf
+
     - family: DaysOne
       fonts:
         - asset: third_party/DaysOne-Regular.ttf
+    - family: Russo
+      fonts:
+        - asset: third_party/russoOne-eegular.ttf

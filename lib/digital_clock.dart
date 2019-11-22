@@ -4,6 +4,7 @@
 
 import 'dart:async';
 
+import 'package:digital_clock/clip_shadow_part.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
@@ -25,7 +26,7 @@ final _lightTheme = {
 final _darkTheme = {
   _Element.background: Colors.black,
   _Element.text: Colors.white,
-  _Element.shadow: Color(0xFF174EA6),
+  _Element.shadow: Colors.black,
 };
 
 /// A basic digital clock.
@@ -43,6 +44,9 @@ class DigitalClock extends StatefulWidget {
 class _DigitalClockState extends State<DigitalClock> {
   DateTime _dateTime = DateTime.now();
   Timer _timer;
+  TextStyle largeStyle;
+  TextStyle mediumStyle;
+  var colorIndex = 3;
 
   @override
   void initState() {
@@ -78,16 +82,13 @@ class _DigitalClockState extends State<DigitalClock> {
   void _updateTime() {
     setState(() {
       _dateTime = DateTime.now();
-      // Update once per minute. If you want to update every second, use the
-      // following code.
+      // Update once per minute. If you want to update every second, use the following code.
       _timer = Timer(
-        Duration(seconds: 1) -
-            Duration(seconds: _dateTime.second) -
-            Duration(milliseconds: _dateTime.millisecond),
+        Duration(minutes: 1) - Duration(seconds: _dateTime.second) - Duration(milliseconds: _dateTime.millisecond),
         _updateTime,
       );
-      // Update once per second, but make sure to do it at the beginning of each
-      // new second, so that the clock is accurate.
+      
+      // Update once per second, but make sure to do it at the beginning of each new second, so that the clock is accurate.
       // _timer = Timer(
       //   Duration(seconds: 1) - Duration(milliseconds: _dateTime.millisecond),
       //   _updateTime,
@@ -105,9 +106,11 @@ class _DigitalClockState extends State<DigitalClock> {
     final minute = DateFormat('mm').format(_dateTime);
     final seconds = DateFormat('ss').format(_dateTime);
     final ampm = DateFormat('aaa').format(_dateTime);
-    final fontSize = 70.00;
-    final offset = -fontSize / 7;
-    final defaultStyle = TextStyle(
+    final _height = MediaQuery.of(context).size.height / 1.8;
+    final _width = MediaQuery.of(context).size.width / 2;
+    final fontSize = 60.00;
+    final date = DateFormat("EEEE, dd MMM").format(_dateTime);
+    largeStyle = TextStyle(
       color: colors[_Element.text],
       fontFamily: 'DaysOne',
       fontSize: fontSize,
@@ -119,7 +122,7 @@ class _DigitalClockState extends State<DigitalClock> {
         ),
       ],
     );
-    final mediumStyle = TextStyle(
+    mediumStyle = TextStyle(
       color: colors[_Element.text],
       fontFamily: 'DaysOne',
       fontSize: fontSize - 30,
@@ -131,65 +134,151 @@ class _DigitalClockState extends State<DigitalClock> {
         ),
       ],
     );
-    final smallStyle = TextStyle(
-      color: colors[_Element.text],
-      fontFamily: 'DaysOne',
-      fontSize: fontSize - 45,
-      shadows: [
-        Shadow(
-          blurRadius: 12,
-          color: colors[_Element.shadow],
-          offset: Offset(1, 5),
-        ),
-      ],
-    );
-
     return Container(
       decoration: BoxDecoration(
-        // Box decoration takes a gradient
         gradient: LinearGradient(
-          // Where the linear gradient begins and ends
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          // Add one stop for each color. Stops should increase from 0 to 1
-          stops: [0.1, 0.5, 0.7, 0.9],
-          colors: [
-            // Colors are easy thanks to Flutter's Colors class.
-            Colors.black,
-            Colors.pink[900],
-            Colors.pink[800],
-            Colors.pink[600],
-          ],
-        ),
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            // Add one stop for each color. Stops should increase from 0 to 1
+            colors: darkColorList[colorIndex]),
       ),
-      height: double.infinity,
-      width: double.infinity,
-      child: Column(
+      child: Stack(
         children: <Widget>[
+          buildUpperBodyContainer(_height),
           Container(
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-            children: <Widget>[
-              Text(
-                hour,
-                style: defaultStyle,
-              ),
-              Text(":", style: defaultStyle),
-              Text(
-                minute,
-                style: defaultStyle,
-              ),
-              Container(
-                margin: EdgeInsets.only(bottom: 10),
-                child: Text(
-                  " " + ampm,
-                  style: mediumStyle,
+            alignment: Alignment.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                buildClock(_width, hour, minute, ampm),
+                Padding(
+                  padding: EdgeInsets.only(top: 20),
+                  child: Text(
+                    date,
+                    style: mediumStyle,
+                  ),
                 ),
-              )
-            ],
-          )),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
+
+  Container buildUpperBodyContainer(double _height) {
+    return Container(
+      height: _height,
+      child: ClipShadowPath(
+        clipper: RoundedClipper(),
+        shadow: Shadow(blurRadius: 30),
+        child: Container(
+          decoration: BoxDecoration(
+            // Box decoration takes a gradient
+            gradient: LinearGradient(
+              // Where the linear gradient begins and ends
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              // Add one stop for each color. Stops should increase from 0 to 1
+              colors: colorList[colorIndex],
+
+              // Colors are easy thanks to Flutter's Colors class.
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container buildClock(double _width, String hour, String minute, String ampm) {
+    return Container(
+        width: _width,
+        alignment: Alignment.center,
+        padding: EdgeInsets.only(top: 10, bottom: 10),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(blurRadius: 20, offset: Offset(0, 5), color: Colors.black)
+          ],
+          // Box decoration takes a gradient
+          gradient: LinearGradient(
+            // Where the linear gradient begins and ends
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            // Add one stop for each color. Stops should increase from 0 to 1
+            colors: colorList[colorIndex],
+          ),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              hour,
+              style: largeStyle,
+            ),
+            Text(":", style: largeStyle),
+            Text(
+              minute,
+              style: largeStyle,
+            ),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              child: Text(
+                " " + ampm,
+                style: mediumStyle,
+              ),
+            )
+          ],
+        ));
+  }
+
+  List<List<Color>> colorList = [
+    [
+      Colors.pink[900],
+      Colors.pink[900],
+      Colors.pink[800],
+      Colors.pink[600],
+      Colors.pink[400],
+    ],
+    [
+      Color(0xff4CA1AF),
+      Color(0xffC4E0E5),
+    ],
+    [
+      Colors.pink[600],
+      Colors.pink[400],
+      Colors.pink[200],
+    ],  [
+      Colors.pink[600],
+      Colors.pink[400],
+      Colors.pink[200],
+    ],
+   
+  ];
+  
+  
+  List<List<Color>> darkColorList = [
+    [
+      Color(0xff526293),
+      Color(0xff2e3652),
+    ],
+    [
+      Color(0xFFD81B60),
+      Color(0xffce1867),
+      Color(0xff450822),
+    ],
+    [
+      Color(0xffc31432),
+      Color(0xff240b36),
+    ],
+    [
+      Colors.pink[900],
+      Colors.pink[900],
+      Colors.pink[800],
+      Colors.pink[600],
+      Colors.pink[400],
+    ],
+  ];
 }
