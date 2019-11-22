@@ -25,6 +25,3 @@ flutter:
     - family: DaysOne
       fonts:
         - asset: third_party/DaysOne-Regular.ttf
-    - family: Russo
-      fonts:
-        - asset: third_party/russoOne-eegular.ttf
