@@ -47,16 +47,18 @@ class _DigitalClockState extends State<DigitalClock>
         Timer _timer;
         TextStyle largeStyle;
         TextStyle mediumStyle;
-        var colorIndex = 3;
+        var colorIndex = 0;
         AnimationController animationController;
         Animation<double> animation;
+        Animation<double> animationOpacity;
         String hour = "";
         String minute = "";
         String seconds = "";
         String ampm = "";
         bool isNewMinute = true;
-        final fontSize = 60.00;
+        final fontSize = 70.00;
         final date = DateFormat("EEEE, dd MMM").format(DateTime.now());
+        
         @override
         void initState() {
                 super.initState();
@@ -86,6 +88,10 @@ class _DigitalClockState extends State<DigitalClock>
         void _updateModel() {
                 setState(() {
                         // Cause the clock to rebuild when the model changes.
+                        if (colorIndex < colorList.length - 1)
+                                colorIndex++;
+                        else
+                                colorIndex = 0;
                 });
         }
         
@@ -93,14 +99,16 @@ class _DigitalClockState extends State<DigitalClock>
                 setState(() {
                         callAnimation();
                         _dateTime = DateTime.now();
-                        hour = DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
+                        hour = DateFormat(
+                            widget.model.is24HourFormat ? 'HH' : 'hh').format(
+                            _dateTime);
                         seconds = DateFormat('ss').format(_dateTime);
                         ampm = DateFormat('aaa').format(_dateTime);
                         String newMinute = DateFormat('mm').format(_dateTime);
                         if (minute != newMinute) {
                                 minute = newMinute;
                                 isNewMinute = true;
-                        }else{
+                        } else {
                                 isNewMinute = false;
                         }
                         // Update once per minute. If you want to update every second, use the following code.
@@ -129,6 +137,9 @@ class _DigitalClockState extends State<DigitalClock>
                         parent: animationController,
                         curve: Curves.easeInOut,
                 );
+                
+                animationOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
+                    animationController);
                 animationController.forward();
         }
         
@@ -146,7 +157,7 @@ class _DigitalClockState extends State<DigitalClock>
                 final _width = MediaQuery
                     .of(context)
                     .size
-                    .width / 2;
+                    .width / 1.5;
                 largeStyle = TextStyle(
                         color: colors[_Element.text],
                         fontFamily: 'DaysOne',
@@ -162,7 +173,7 @@ class _DigitalClockState extends State<DigitalClock>
                 mediumStyle = TextStyle(
                         color: colors[_Element.text],
                         fontFamily: 'DaysOne',
-                        fontSize: fontSize - 40,
+                        fontSize: fontSize / 2.5,
                         shadows: [
                                 Shadow(
                                         blurRadius: 12,
@@ -185,9 +196,11 @@ class _DigitalClockState extends State<DigitalClock>
                                         Container(
                                                 alignment: Alignment.center,
                                                 child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        mainAxisAlignment: MainAxisAlignment
+                                                            .center,
                                                         children: <Widget>[
-                                                                buildClock(_width),
+                                                                buildClock(
+                                                                    _width),
                                                                 buildDate(),
                                                         ],
                                                 ),
@@ -196,11 +209,13 @@ class _DigitalClockState extends State<DigitalClock>
                         ),
                 );
         }
+        
         Container buildClock(double _width) {
                 return Container(
                     width: _width,
                     alignment: Alignment.center,
-                    padding: EdgeInsets.only(top: 10, bottom: 10),
+                    padding: EdgeInsets.only(
+                        top: 15, bottom: 15, left: 40, right: 30),
                     decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
@@ -224,28 +239,32 @@ class _DigitalClockState extends State<DigitalClock>
                                     Text(hour, style: largeStyle,),
                                     Text(":", style: largeStyle,),
                                     isNewMinute ?
-                                    buildMinuteText(minute):
+                                    buildMinuteText(minute) :
                                     Text(minute, style: largeStyle,),
                                     Container(
-                                            padding: EdgeInsets.only(left: 10),
-                                            child: Column(
-                                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                                    children: <Widget>[
-                                                            buildMediumText(seconds),
-                                                            Text(" " + ampm, style: mediumStyle,),
-                                                    ],
-                                            ),
+                                            padding: EdgeInsets.only(top: 30),
+                                            alignment: Alignment.bottomLeft,
+                                            child: Text(" " + ampm,
+                                                    style: mediumStyle,),
+//                                            child: Column(
+//                                                    crossAxisAlignment: CrossAxisAlignment.end,
+//                                                    children: <Widget>[
+//                                                            buildMediumText(seconds),
+//                                                            Text(" " + ampm, style: mediumStyle,),
+//                                                    ],
+//                                            ),
                                     ),
                             ],
                     ));
         }
-
+        
         Padding buildDate() {
                 return Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(date, style: mediumStyle,),
                 );
         }
+        
         Container buildUpperBodyContainer(double _height) {
                 return Container(
                         height: _height,
@@ -272,18 +291,21 @@ class _DigitalClockState extends State<DigitalClock>
                 );
         }
         
- 
-        ScaleTransition buildMediumText(String value) {
-                return ScaleTransition(
-                        scale: animation,
-                        child: Container(
-                                child: Text(
-                                        value,
-                                        style: mediumStyle,
-                                ),
-                        ),
-                );
+        Widget buildMediumText(String value) {
+                return AnimatedOpacity(
+                    duration: Duration(milliseconds: 500),
+                    opacity: animationOpacity.value,
+                    child: ScaleTransition(
+                            scale: animation,
+                            child: Container(
+                                    child: Text(
+                                            value,
+                                            style: mediumStyle,
+                                    ),
+                            ),
+                    ));
         }
+        
         ScaleTransition buildMinuteText(String value) {
                 return ScaleTransition(
                         scale: animation,
@@ -296,46 +318,41 @@ class _DigitalClockState extends State<DigitalClock>
                 );
         }
         
-                List<List<Color>> colorList = [
+        List<List<Color>> colorList = [
                 [
-                        Colors.pink[900],
-                        Colors.pink[900],
-                        Colors.pink[800],
-                        Colors.pink[600],
-                        Colors.pink[400],
+                        Color(0xff004c56),
+                        Color(0xff002e34),
                 ],
                 [
-                        Color(0xff4CA1AF),
-                        Color(0xffC4E0E5),
+                        Color(0xffc43d56),
+                        Color(0xff730318),
                 ],
-                [
-                        Colors.pink[600],
-                        Colors.pink[400],
-                        Colors.pink[200],
-                ],
-                [
-                        Colors.pink[600],
-                        Colors.pink[400],
-                        Colors.pink[200],
-                ],
-        ];
-        
-        List<List<Color>> darkColorList = [
                 [
                         Color(0xff526293),
                         Color(0xff2e3652),
                 ],
                 [
-                        Color(0xFFD81B60),
-                        Color(0xffce1867),
+                        Colors.pink[800],
+                        Colors.pink[600],
+                        Colors.pink[400],
+                ],
+        ];
+        
+        List<List<Color>> darkColorList = [
+                [
+                        Color(0xff004c56),
+                        Color(0xff002e34),
+                ],
+                [
+                        Color(0xff600318),
+                        Color(0xffc43d56)
+                ],
+                [
+                        Color(0xff526293),
+                        Color(0xff2e3652),
+                ],
+                [
                         Color(0xff450822),
-                ],
-                [
-                        Color(0xffc31432),
-                        Color(0xff240b36),
-                ],
-                [
-                        Colors.pink[900],
                         Colors.pink[900],
                         Colors.pink[800],
                         Colors.pink[600],
