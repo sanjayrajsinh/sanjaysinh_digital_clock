@@ -7,6 +7,7 @@ import 'dart:async';
 import 'package:digital_clock/clip_shadow_part.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_clock_helper/model.dart';
 import 'package:intl/intl.dart';
@@ -56,7 +57,7 @@ class _DigitalClockState extends State<DigitalClock>
         String seconds = "";
         String ampm = "";
         bool isNewMinute = true;
-        final fontSize = 70.00;
+        final fontSize = 80.00;
         final date = DateFormat("EEEE, dd MMM").format(DateTime.now());
         
         @override
@@ -112,18 +113,19 @@ class _DigitalClockState extends State<DigitalClock>
                                 isNewMinute = false;
                         }
                         // Update once per minute. If you want to update every second, use the following code.
-//      _timer = Timer(
-//        Duration(minutes: 1) -
-//            Duration(seconds: _dateTime.second) -
-//            Duration(milliseconds: _dateTime.millisecond),
-//        _updateTime,
-//      );
-                        // Update once per second, but make sure to do it at the beginning of each new second, so that the clock is accurate.
                         _timer = Timer(
-                                Duration(seconds: 1) - Duration(
-                                    milliseconds: _dateTime.millisecond),
+                                Duration(minutes: 1) -
+                                    Duration(seconds: _dateTime.second) -
+                                    Duration(
+                                        milliseconds: _dateTime.millisecond),
                                 _updateTime,
                         );
+                        // Update once per second, but make sure to do it at the beginning of each new second, so that the clock is accurate.
+//                        _timer = Timer(
+//                                Duration(seconds: 1) - Duration(
+//                                    milliseconds: _dateTime.millisecond),
+//                                _updateTime,
+//                        );
                 });
         }
         
@@ -145,6 +147,11 @@ class _DigitalClockState extends State<DigitalClock>
         
         @override
         Widget build(BuildContext context) {
+                // Set landscape orientation
+                SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.landscapeRight,
+                ]);
                 final colors = Theme
                     .of(context)
                     .brightness == Brightness.light
@@ -215,7 +222,7 @@ class _DigitalClockState extends State<DigitalClock>
                     width: _width,
                     alignment: Alignment.center,
                     padding: EdgeInsets.only(
-                        top: 15, bottom: 15, left: 40, right: 30),
+                        top: 15, bottom: 15, left: 40, right: 40),
                     decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
@@ -242,10 +249,9 @@ class _DigitalClockState extends State<DigitalClock>
                                     buildMinuteText(minute) :
                                     Text(minute, style: largeStyle,),
                                     Container(
-                                            padding: EdgeInsets.only(top: 30),
-                                            alignment: Alignment.bottomLeft,
-                                            child: Text(" " + ampm,
-                                                    style: mediumStyle,),
+                                        padding: EdgeInsets.only(top: 30),
+                                        alignment: Alignment.bottomLeft,
+                                        child: Container()
 //                                            child: Column(
 //                                                    crossAxisAlignment: CrossAxisAlignment.end,
 //                                                    children: <Widget>[
@@ -324,8 +330,8 @@ class _DigitalClockState extends State<DigitalClock>
                         Color(0xff002e34),
                 ],
                 [
-                        Color(0xffc43d56),
-                        Color(0xff730318),
+                        Color(0xff622774),
+                        Color(0xffc53364),
                 ],
                 [
                         Color(0xff526293),
@@ -344,8 +350,8 @@ class _DigitalClockState extends State<DigitalClock>
                         Color(0xff002e34),
                 ],
                 [
-                        Color(0xff600318),
-                        Color(0xffc43d56)
+                        Color(0xff622774),
+                        Color(0xffc53364),
                 ],
                 [
                         Color(0xff526293),
