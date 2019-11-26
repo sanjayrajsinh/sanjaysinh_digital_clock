@@ -55,6 +55,7 @@ class _DigitalClockState extends State<DigitalClock>
                 super.initState();
                 Future.delayed(Duration.zero,(){
                         widget.model.addListener(_updateModel);
+                        _callAnimation();
                         _updateTime();
                         _updateModel();
                         final colors = Theme.of(context).brightness == Brightness.light ? _lightTheme : _darkTheme;
@@ -96,10 +97,6 @@ class _DigitalClockState extends State<DigitalClock>
         
         void _updateModel() {
                 setState(() {
-                        if (colorIndex < colorList.length - 1)       // Cause the clock to rebuild when the model changes.
-                                colorIndex++;
-                        else
-                                colorIndex = 0;
                 });
         }
         void _updateTime() {
@@ -152,12 +149,7 @@ class _DigitalClockState extends State<DigitalClock>
         @override
         Widget build(BuildContext context) {
                 // Set landscape orientation
-                SystemChrome.setPreferredOrientations([
-                        DeviceOrientation.landscapeLeft,
-                        DeviceOrientation.landscapeRight,
-                ]);
-                _height = MediaQuery.of(context).size.height / 1.8;
-                _width = MediaQuery.of(context).size.width / 1.5;
+                initializeValue(context);
                 return Container(
                         decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -183,6 +175,20 @@ class _DigitalClockState extends State<DigitalClock>
                                 ],
                         ),
                 );
+        }
+
+        void initializeValue(BuildContext context) {
+                SystemChrome.setPreferredOrientations([
+                        DeviceOrientation.landscapeLeft,
+                        DeviceOrientation.landscapeRight,
+                ]);
+                if (Theme.of(context).brightness == Brightness.light) {
+                        colorIndex = 0;
+                } else {
+                        colorIndex = 1;
+                }
+                _height = MediaQuery.of(context).size.height / 1.8;
+                _width = MediaQuery.of(context).size.width / 1.5;
         }
         
         Widget _buildClockWidget() {
@@ -226,7 +232,7 @@ class _DigitalClockState extends State<DigitalClock>
                 return Padding(
                         padding: EdgeInsets.only(top: 20),
                         child: Text(
-                       DateFormat("EEEE, dd MMM").format(DateTime.now()),
+                       DateFormat("EEEE, dd MMM").format(_dateTime),
                                 style: mediumStyle,
                         ),
                 );
@@ -243,44 +249,27 @@ class _DigitalClockState extends State<DigitalClock>
         var colorIndex = 0;
         final    darkColorList = [
                 [
-                        Color(0xff004c56),
-                        Color(0xff002e34),
-                ],
-                [
-                        Color(0xff622774),
-                        Color(0xffc53364),
-                ],
-                [
-                        Color(0xff526293),
-                        Color(0xff2e3652),
-                ],
-                [
                         Color(0xff450822),
                         Colors.pink[900],
                         Colors.pink[800],
                         Colors.pink[600],
                         Colors.pink[400],
                 ],
-        ];
-        final colorList = [
                 [
                         Color(0xff004c56),
                         Color(0xff002e34),
                 ],
-                [
-                        Color(0xff622774),
-                        Color(0xffc53364),
-                ],
-                [
-                        Color(0xff526293),
-                        Color(0xff2e3652),
-                ],
+        ];
+        final colorList = [
                 [
                         Colors.pink[800],
                         Colors.pink[600],
                         Colors.pink[400],
                 ],
+                [
+                        Color(0xff004c56),
+                        Color(0xff002e34),
+                ],
         ];
-      
 }
 
