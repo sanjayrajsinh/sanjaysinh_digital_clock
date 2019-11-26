@@ -4,7 +4,8 @@
 
 import 'dart:async';
 
-import 'package:digital_clock/clip_shadow_part.dart';
+import 'package:digital_clock/curve_clip_path.dart';
+import 'package:digital_clock/animated_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
@@ -30,12 +31,8 @@ final _darkTheme = {
         _Element.shadow: Colors.black,
 };
 
-/// A basic digital clock.
-///
-/// You can do better than this!
 class DigitalClock extends StatefulWidget {
         const DigitalClock(this.model);
-        
         final ClockModel model;
         
         @override
@@ -45,28 +42,47 @@ class DigitalClock extends StatefulWidget {
 class _DigitalClockState extends State<DigitalClock>
     with TickerProviderStateMixin {
         DateTime _dateTime = DateTime.now();
+        AnimationController _animationController;
+        Animation<double> _animation;
         Timer _timer;
-        TextStyle largeStyle;
-        TextStyle mediumStyle;
-        var colorIndex = 0;
-        AnimationController animationController;
-        Animation<double> animation;
-        Animation<double> animationOpacity;
-        String hour = "";
-        String minute = "";
-        String seconds = "";
-        String ampm = "";
-        bool isNewMinute = true;
+        String _hour = "00",_minute = "00";
+        bool isNewMinute = false, isNewHour = false;
+        TextStyle largeStyle, mediumStyle;
         final fontSize = 80.00;
-        final date = DateFormat("EEEE, dd MMM").format(DateTime.now());
-        
+        double _height,_width;
         @override
         void initState() {
                 super.initState();
-                callAnimation();
-                widget.model.addListener(_updateModel);
-                _updateTime();
-                _updateModel();
+                Future.delayed(Duration.zero,(){
+                        widget.model.addListener(_updateModel);
+                        _updateTime();
+                        _updateModel();
+                        final colors = Theme.of(context).brightness == Brightness.light ? _lightTheme : _darkTheme;
+                        largeStyle = TextStyle(
+                                color: colors[_Element.text],
+                                fontFamily: 'DaysOne',
+                                fontSize: fontSize,
+                                shadows: [
+                                        Shadow(
+                                                blurRadius: 12,
+                                                color: colors[_Element.shadow],
+                                                offset: Offset(1, 5),
+                                        ),
+                                ],
+                        );
+                        mediumStyle = TextStyle(
+                                color: colors[_Element.text],
+                                fontFamily: 'DaysOne',
+                                fontSize: fontSize / 2.5,
+                                shadows: [
+                                        Shadow(
+                                                blurRadius: 12,
+                                                color: colors[_Element.shadow],
+                                                offset: Offset(1, 5),
+                                        ),
+                                ],
+                        );
+                });
         }
         
         @override
@@ -78,71 +94,59 @@ class _DigitalClockState extends State<DigitalClock>
                 }
         }
         
-        @override
-        void dispose() {
-                _timer?.cancel();
-                widget.model.removeListener(_updateModel);
-                widget.model.dispose();
-                super.dispose();
-        }
-        
         void _updateModel() {
                 setState(() {
-                        // Cause the clock to rebuild when the model changes.
-                        if (colorIndex < colorList.length - 1)
+                        if (colorIndex < colorList.length - 1)       // Cause the clock to rebuild when the model changes.
                                 colorIndex++;
                         else
                                 colorIndex = 0;
                 });
         }
-        
         void _updateTime() {
-                setState(() {
-                        callAnimation();
-                        _dateTime = DateTime.now();
-                        hour = DateFormat(
-                            widget.model.is24HourFormat ? 'HH' : 'hh').format(
-                            _dateTime);
-                        seconds = DateFormat('ss').format(_dateTime);
-                        ampm = DateFormat('aaa').format(_dateTime);
-                        String newMinute = DateFormat('mm').format(_dateTime);
-                        if (minute != newMinute) {
-                                minute = newMinute;
-                                isNewMinute = true;
-                        } else {
-                                isNewMinute = false;
-                        }
-                        // Update once per minute. If you want to update every second, use the following code.
-                        _timer = Timer(
-                                Duration(minutes: 1) -
-                                    Duration(seconds: _dateTime.second) -
-                                    Duration(
-                                        milliseconds: _dateTime.millisecond),
-                                _updateTime,
-                        );
-                        // Update once per second, but make sure to do it at the beginning of each new second, so that the clock is accurate.
+                _dateTime = DateTime.now();
+                var newHour = DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
+                if (_hour != newHour) {
+                        _hour=newHour;
+                        isNewHour = true;
+                        _callAnimation();
+                } else {
+                        isNewHour = false;
+                }
+                String newMinute = DateFormat('mm').format(_dateTime);
+                if (_minute != newMinute) {
+                        _minute=newMinute;
+                        isNewMinute = true;
+                        _callAnimation();
+                } else {
+                        isNewMinute = false;
+                }
+                // Update once per _minute. If you want to update every second, use the following code.
 //                        _timer = Timer(
-//                                Duration(seconds: 1) - Duration(
-//                                    milliseconds: _dateTime.millisecond),
+//                                Duration(minutes: 1) -
+//                                    Duration(seconds: _dateTime.second) -
+//                                    Duration(
+//                                        milliseconds: _dateTime.millisecond),
 //                                _updateTime,
 //                        );
-                });
+                // Update once per second, but make sure to do it at the beginning of each new second, so that the clock is accurate.
+                _timer = Timer(
+                        Duration(seconds: 1) -
+                            Duration(milliseconds: _dateTime.millisecond),
+                        _updateTime,
+                );
         }
-        
-        void callAnimation() {
-                animationController = AnimationController(
+
+        void _callAnimation() {
+                _animationController = AnimationController(
                         vsync: this,
                         duration: Duration(milliseconds: 600),
                 )
                         ..addListener(() => setState(() {}));
-                animation = CurvedAnimation(
-                        parent: animationController,
+                _animation = CurvedAnimation(
+                        parent: _animationController,
                         curve: Curves.easeInOut,
                 );
-                
-                animationOpacity = Tween<double>(begin: 0.0, end: 1.0).animate(
-                    animationController);
-                animationController.forward();
+                _animationController.forward();
         }
         
         @override
@@ -152,43 +156,8 @@ class _DigitalClockState extends State<DigitalClock>
                         DeviceOrientation.landscapeLeft,
                         DeviceOrientation.landscapeRight,
                 ]);
-                final colors = Theme
-                    .of(context)
-                    .brightness == Brightness.light
-                    ? _lightTheme
-                    : _darkTheme;
-                final _height = MediaQuery
-                    .of(context)
-                    .size
-                    .height / 1.8;
-                final _width = MediaQuery
-                    .of(context)
-                    .size
-                    .width / 1.5;
-                largeStyle = TextStyle(
-                        color: colors[_Element.text],
-                        fontFamily: 'DaysOne',
-                        fontSize: fontSize,
-                        shadows: [
-                                Shadow(
-                                        blurRadius: 12,
-                                        color: colors[_Element.shadow],
-                                        offset: Offset(1, 5),
-                                ),
-                        ],
-                );
-                mediumStyle = TextStyle(
-                        color: colors[_Element.text],
-                        fontFamily: 'DaysOne',
-                        fontSize: fontSize / 2.5,
-                        shadows: [
-                                Shadow(
-                                        blurRadius: 12,
-                                        color: colors[_Element.shadow],
-                                        offset: Offset(1, 5),
-                                ),
-                        ],
-                );
+                _height = MediaQuery.of(context).size.height / 1.8;
+                _width = MediaQuery.of(context).size.width / 1.5;
                 return Container(
                         decoration: BoxDecoration(
                                 gradient: LinearGradient(
@@ -199,16 +168,15 @@ class _DigitalClockState extends State<DigitalClock>
                         ),
                         child: Stack(
                                 children: <Widget>[
-                                        buildUpperBodyContainer(_height),
+                                        CurveClipPath(height: _height,colors:  colorList[colorIndex]),
                                         Container(
                                                 alignment: Alignment.center,
                                                 child: Column(
                                                         mainAxisAlignment: MainAxisAlignment
                                                             .center,
                                                         children: <Widget>[
-                                                                buildClock(
-                                                                    _width),
-                                                                buildDate(),
+                                                                _buildClockWidget(),
+                                                                _buildDateWidget(),
                                                         ],
                                                 ),
                                         ),
@@ -217,7 +185,7 @@ class _DigitalClockState extends State<DigitalClock>
                 );
         }
         
-        Container buildClock(double _width) {
+        Widget _buildClockWidget() {
                 return Container(
                     width: _width,
                     alignment: Alignment.center,
@@ -243,108 +211,37 @@ class _DigitalClockState extends State<DigitalClock>
                             crossAxisAlignment: CrossAxisAlignment.center,
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: <Widget>[
-                                    Text(hour, style: largeStyle,),
+                                    isNewHour
+                                    ? ScaleAnimation(_animation,_hour,largeStyle)
+                                    :Text(_hour, style: largeStyle,),
                                     Text(":", style: largeStyle,),
-                                    isNewMinute ?
-                                    buildMinuteText(minute) :
-                                    Text(minute, style: largeStyle,),
-                                    Container(
-                                        padding: EdgeInsets.only(top: 30),
-                                        alignment: Alignment.bottomLeft,
-                                        child: Container()
-//                                            child: Column(
-//                                                    crossAxisAlignment: CrossAxisAlignment.end,
-//                                                    children: <Widget>[
-//                                                            buildMediumText(seconds),
-//                                                            Text(" " + ampm, style: mediumStyle,),
-//                                                    ],
-//                                            ),
-                                    ),
+                                    isNewMinute
+                                        ? ScaleAnimation(_animation,_minute,largeStyle)
+                                        : Text(_minute, style: largeStyle,),
                             ],
                     ));
         }
         
-        Padding buildDate() {
+        Widget _buildDateWidget() {
                 return Padding(
                         padding: EdgeInsets.only(top: 20),
-                        child: Text(date, style: mediumStyle,),
-                );
-        }
-        
-        Container buildUpperBodyContainer(double _height) {
-                return Container(
-                        height: _height,
-                        child: ClipShadowPath(
-                                clipper: RoundedClipper(),
-                                shadow: Shadow(blurRadius: 30),
-                                child: Container(
-                                        decoration: BoxDecoration(
-                                                // Box decoration takes a gradient
-                                                gradient: LinearGradient(
-                                                        // Where the linear gradient begins and ends
-                                                        begin: Alignment
-                                                            .topLeft,
-                                                        end: Alignment
-                                                            .bottomRight,
-                                                        // Add one stop for each color. Stops should increase from 0 to 1
-                                                        colors: colorList[colorIndex],
-                                                        
-                                                        // Colors are easy thanks to Flutter's Colors class.
-                                                ),
-                                        ),
-                                ),
+                        child: Text(
+                       DateFormat("EEEE, dd MMM").format(DateTime.now()),
+                                style: mediumStyle,
                         ),
                 );
         }
-        
-        Widget buildMediumText(String value) {
-                return AnimatedOpacity(
-                    duration: Duration(milliseconds: 500),
-                    opacity: animationOpacity.value,
-                    child: ScaleTransition(
-                            scale: animation,
-                            child: Container(
-                                    child: Text(
-                                            value,
-                                            style: mediumStyle,
-                                    ),
-                            ),
-                    ));
+
+        @override
+        void dispose() {
+                _timer?.cancel();
+                widget.model.removeListener(_updateModel);
+                widget.model.dispose();
+                super.dispose();
         }
-        
-        ScaleTransition buildMinuteText(String value) {
-                return ScaleTransition(
-                        scale: animation,
-                        child: Container(
-                                child: Text(
-                                        value,
-                                        style: largeStyle,
-                                ),
-                        ),
-                );
-        }
-        
-        List<List<Color>> colorList = [
-                [
-                        Color(0xff004c56),
-                        Color(0xff002e34),
-                ],
-                [
-                        Color(0xff622774),
-                        Color(0xffc53364),
-                ],
-                [
-                        Color(0xff526293),
-                        Color(0xff2e3652),
-                ],
-                [
-                        Colors.pink[800],
-                        Colors.pink[600],
-                        Colors.pink[400],
-                ],
-        ];
-        
-        List<List<Color>> darkColorList = [
+
+        var colorIndex = 0;
+        final    darkColorList = [
                 [
                         Color(0xff004c56),
                         Color(0xff002e34),
@@ -365,4 +262,25 @@ class _DigitalClockState extends State<DigitalClock>
                         Colors.pink[400],
                 ],
         ];
+        final colorList = [
+                [
+                        Color(0xff004c56),
+                        Color(0xff002e34),
+                ],
+                [
+                        Color(0xff622774),
+                        Color(0xffc53364),
+                ],
+                [
+                        Color(0xff526293),
+                        Color(0xff2e3652),
+                ],
+                [
+                        Colors.pink[800],
+                        Colors.pink[600],
+                        Colors.pink[400],
+                ],
+        ];
+      
 }
+
