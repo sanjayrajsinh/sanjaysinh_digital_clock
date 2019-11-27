@@ -58,31 +58,6 @@ class _DigitalClockState extends State<DigitalClock>
                         _callAnimation();
                         _updateTime();
                         _updateModel();
-                        final colors = Theme.of(context).brightness == Brightness.light ? _lightTheme : _darkTheme;
-                        largeStyle = TextStyle(
-                                color: colors[_Element.text],
-                                fontFamily: 'DaysOne',
-                                fontSize: fontSize,
-                                shadows: [
-                                        Shadow(
-                                                blurRadius: 12,
-                                                color: colors[_Element.shadow],
-                                                offset: Offset(1, 5),
-                                        ),
-                                ],
-                        );
-                        mediumStyle = TextStyle(
-                                color: colors[_Element.text],
-                                fontFamily: 'DaysOne',
-                                fontSize: fontSize / 2.5,
-                                shadows: [
-                                        Shadow(
-                                                blurRadius: 12,
-                                                color: colors[_Element.shadow],
-                                                offset: Offset(1, 5),
-                                        ),
-                                ],
-                        );
                 });
         }
         
@@ -97,6 +72,7 @@ class _DigitalClockState extends State<DigitalClock>
         
         void _updateModel() {
                 setState(() {
+                
                 });
         }
         void _updateTime() {
@@ -189,6 +165,31 @@ class _DigitalClockState extends State<DigitalClock>
                 }
                 _height = MediaQuery.of(context).size.height / 1.8;
                 _width = MediaQuery.of(context).size.width / 1.5;
+                final colors = Theme.of(context).brightness == Brightness.light ? _lightTheme : _darkTheme;
+                largeStyle = TextStyle(
+                        color: colors[_Element.text],
+                        fontFamily: 'DaysOne',
+                        fontSize: fontSize,
+                        shadows: [
+                                Shadow(
+                                        blurRadius: 12,
+                                        color: colors[_Element.shadow],
+                                        offset: Offset(1, 5),
+                                ),
+                        ],
+                );
+                mediumStyle = TextStyle(
+                        color: colors[_Element.text],
+                        fontFamily: 'DaysOne',
+                        fontSize: fontSize / 2.5,
+                        shadows: [
+                                Shadow(
+                                        blurRadius: 12,
+                                        color: colors[_Element.shadow],
+                                        offset: Offset(1, 5),
+                                ),
+                        ],
+                );
         }
         
         Widget _buildClockWidget() {
@@ -256,20 +257,31 @@ class _DigitalClockState extends State<DigitalClock>
                         Colors.pink[400],
                 ],
                 [
+                        Color(0xffcc3c19),
+                        Color(0xffff4b1f),
+                        Color(0xffff9068),
+                ],
+                [
                         Color(0xff004c56),
                         Color(0xff002e34),
                 ],
+               
         ];
         final colorList = [
                 [
                         Colors.pink[800],
                         Colors.pink[600],
-                        Colors.pink[400],
+                        Colors.deepOrange[200],
+                ],
+                [
+                        Color(0xffff4b1f),
+                        Color(0xffff9068),
                 ],
                 [
                         Color(0xff004c56),
                         Color(0xff002e34),
                 ],
+               
         ];
 }
 
