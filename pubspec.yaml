@@ -19,9 +19,9 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   fonts:
-    - family: Rightous
+    - family: Merienda
       fonts:
-        - asset: third_party/Righteous-Regular.ttf
+        - asset: third_party/Merienda-Regular.ttf
 
     - family: DaysOne
       fonts:

@@ -45,11 +45,10 @@ class _DigitalClockState extends State<DigitalClock>
         AnimationController _animationController;
         Animation<double> _animation;
         Timer _timer;
-        String _hour = "00",_minute = "00";
-        bool isNewMinute = false, isNewHour = false;
-        TextStyle largeStyle, mediumStyle;
-        final fontSize = 80.00;
-        double _height,_width;
+        String _hour = "00",_minute = "00",_second = "00",_AM_PM="";
+        bool  isNewSecond = false,  isNewMinute = false, isNewHour = false;
+        TextStyle largeStyle, mediumStyle,smallStyle;
+        final fontSize = 90.00;
         @override
         void initState() {
                 super.initState();
@@ -80,6 +79,7 @@ class _DigitalClockState extends State<DigitalClock>
                 var newHour = DateFormat(widget.model.is24HourFormat ? 'HH' : 'hh').format(_dateTime);
                 if (_hour != newHour) {
                         _hour=newHour;
+                        _AM_PM=DateFormat('aa').format(_dateTime);
                         isNewHour = true;
                         _callAnimation();
                 } else {
@@ -88,11 +88,20 @@ class _DigitalClockState extends State<DigitalClock>
                 String newMinute = DateFormat('mm').format(_dateTime);
                 if (_minute != newMinute) {
                         _minute=newMinute;
-                        isNewMinute = true;
                         _callAnimation();
+                        isNewMinute = true;
                 } else {
                         isNewMinute = false;
                 }
+                String newSecond= DateFormat("ss").format(_dateTime);
+                if (_second != newSecond) {
+                        _second=newSecond;
+                        isNewSecond = true;
+                        _callAnimation();
+                } else {
+                        isNewSecond = false;
+                }
+
                 // Update once per _minute. If you want to update every second, use the following code.
 //                        _timer = Timer(
 //                                Duration(minutes: 1) -
@@ -136,17 +145,13 @@ class _DigitalClockState extends State<DigitalClock>
                         ),
                         child: Stack(
                                 children: <Widget>[
-                                        CurveClipPath(height: _height,colors:  colorList[colorIndex]),
-                                        Container(
-                                                alignment: Alignment.center,
-                                                child: Column(
-                                                        mainAxisAlignment: MainAxisAlignment
-                                                            .center,
-                                                        children: <Widget>[
-                                                                _buildClockWidget(),
-                                                                _buildDateWidget(),
-                                                        ],
-                                                ),
+                                        CurveClipPath(height: MediaQuery.of(context).size.height / 1.8,colors:  colorList[colorIndex]),
+                                        Column(
+                                                mainAxisAlignment: MainAxisAlignment.center,
+                                                children: <Widget>[
+                                                         _buildClockWidget(),
+                                                        _buildDateWidget(),
+                                                ],
                                         ),
                                 ],
                         ),
@@ -163,8 +168,6 @@ class _DigitalClockState extends State<DigitalClock>
                 } else {
                         colorIndex = 1;
                 }
-                _height = MediaQuery.of(context).size.height / 1.8;
-                _width = MediaQuery.of(context).size.width / 1.5;
                 final colors = Theme.of(context).brightness == Brightness.light ? _lightTheme : _darkTheme;
                 largeStyle = TextStyle(
                         color: colors[_Element.text],
@@ -180,8 +183,21 @@ class _DigitalClockState extends State<DigitalClock>
                 );
                 mediumStyle = TextStyle(
                         color: colors[_Element.text],
+                        fontFamily: 'Merienda',
+                        fontSize: fontSize / 3,
+                        shadows: [
+                                Shadow(
+                                        blurRadius: 12,
+                                        color: colors[_Element.shadow],
+                                        offset: Offset(1, 5),
+                                ),
+                        ],
+                );
+                smallStyle = TextStyle(
+                        color: colors[_Element.text],
                         fontFamily: 'DaysOne',
-                        fontSize: fontSize / 2.5,
+                        fontSize: fontSize /3.5,
+                        fontWeight: FontWeight.w400,
                         shadows: [
                                 Shadow(
                                         blurRadius: 12,
@@ -193,40 +209,53 @@ class _DigitalClockState extends State<DigitalClock>
         }
         
         Widget _buildClockWidget() {
-                return Container(
-                    width: _width,
-                    alignment: Alignment.center,
-                    padding: EdgeInsets.only(
-                        top: 15, bottom: 15, left: 40, right: 40),
-                    decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                                    BoxShadow(blurRadius: 20,
-                                        offset: Offset(0, 5),
-                                        color: Colors.black)
-                            ],
-                            // Box decoration takes a gradient
-                            gradient: LinearGradient(
-                                    // Where the linear gradient begins and ends
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    // Add one stop for each color. Stops should increase from 0 to 1
-                                    colors: colorList[colorIndex],
-                            ),
-                    ),
-                    child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: <Widget>[
-                                    isNewHour
-                                    ? ScaleAnimation(_animation,_hour,largeStyle)
-                                    :Text(_hour, style: largeStyle,),
-                                    Text(":", style: largeStyle,),
-                                    isNewMinute
-                                        ? ScaleAnimation(_animation,_minute,largeStyle)
-                                        : Text(_minute, style: largeStyle,),
-                            ],
-                    ));
+                return Align(
+                  child: Container(
+                          padding: EdgeInsets.symmetric(horizontal: 30,vertical: 10),
+                        decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                        BoxShadow(blurRadius: 20,
+                                            offset: Offset(0, 5),
+                                            color: Colors.black)
+                                ],
+                                // Box decoration takes a gradient
+                                gradient: LinearGradient(
+                                        // Where the linear gradient begins and ends
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        // Add one stop for each color. Stops should increase from 0 to 1
+                                        colors: colorList[colorIndex],
+                                ),
+                        ),
+                        child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: <Widget>[
+                                        isNewHour
+                                        ? ScaleAnimation(_animation,_hour,largeStyle)
+                                        :Text(_hour, style: largeStyle,),
+                                        Text(":", style: largeStyle,),
+                                        isNewMinute
+                                            ? ScaleAnimation(_animation,_minute,largeStyle)
+                                            : Text(_minute, style: largeStyle,),
+                                         Container(
+                                                  width: 70,
+                                                  margin: EdgeInsets.only(left: 10),
+                                            child: Column(
+                                                    children: <Widget>[
+                                                    isNewSecond
+                                                        ? ScaleAnimation(_animation,_second,smallStyle)
+                                                        : Text(_second, style: smallStyle,),
+                                                    Text(_AM_PM, style: smallStyle,),
+                                            ],
+                                          ),
+                                        )
+                                ],
+                        ),
+                  ),
+                );
         }
         
         Widget _buildDateWidget() {
@@ -257,9 +286,8 @@ class _DigitalClockState extends State<DigitalClock>
                         Colors.pink[400],
                 ],
                 [
-                        Color(0xffcc3c19),
-                        Color(0xffff4b1f),
-                        Color(0xffff9068),
+                        Color(0xff2f3278),
+                        Color(0xff8f94fb),
                 ],
                 [
                         Color(0xff004c56),
@@ -274,13 +302,14 @@ class _DigitalClockState extends State<DigitalClock>
                         Colors.deepOrange[200],
                 ],
                 [
-                        Color(0xffff4b1f),
-                        Color(0xffff9068),
+                        Color(0xff4e54c8),
+                        Color(0xff8f94fb),
                 ],
                 [
                         Color(0xff004c56),
                         Color(0xff002e34),
                 ],
+               
                
         ];
 }
