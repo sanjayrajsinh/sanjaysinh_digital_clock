@@ -172,6 +172,7 @@ class _DigitalClockState extends State<DigitalClock>
                 largeStyle = TextStyle(
                         color: colors[_Element.text],
                         fontFamily: 'DaysOne',
+                        fontWeight: FontWeight.w700,
                         fontSize: fontSize,
                         shadows: [
                                 Shadow(
@@ -197,7 +198,7 @@ class _DigitalClockState extends State<DigitalClock>
                         color: colors[_Element.text],
                         fontFamily: 'DaysOne',
                         fontSize: fontSize /3.5,
-                        fontWeight: FontWeight.w400,
+                        fontWeight: FontWeight.w600,
                         shadows: [
                                 Shadow(
                                         blurRadius: 12,
@@ -244,6 +245,7 @@ class _DigitalClockState extends State<DigitalClock>
                                                   width: 70,
                                                   margin: EdgeInsets.only(left: 10),
                                             child: Column(
+                                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                     children: <Widget>[
                                                     isNewSecond
                                                         ? ScaleAnimation(_animation,_second,smallStyle)
