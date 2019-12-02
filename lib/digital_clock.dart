@@ -48,7 +48,7 @@ class _DigitalClockState extends State<DigitalClock>
         String _hour = "00",_minute = "00",_second = "00",_AM_PM="";
         bool  isNewSecond = false,  isNewMinute = false, isNewHour = false;
         TextStyle largeStyle, mediumStyle,smallStyle;
-        final fontSize = 90.00;
+        final fontSize = 80.00;
         @override
         void initState() {
                 super.initState();
