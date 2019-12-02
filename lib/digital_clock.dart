@@ -1,11 +1,7 @@
-// Copyright 2019 The Chromium Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style license that can be
-// found in the LICENSE file.
-
 import 'dart:async';
 
-import 'package:digital_clock/curve_clip_path.dart';
-import 'package:digital_clock/animated_widget.dart';
+import 'package:sanjaysinh_digital_clock/curve_clip_path.dart';
+import 'package:sanjaysinh_digital_clock/animated_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
