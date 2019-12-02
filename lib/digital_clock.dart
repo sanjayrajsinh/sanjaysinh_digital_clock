@@ -119,15 +119,9 @@ class _DigitalClockState extends State<DigitalClock>
         }
 
         void _callAnimation() {
-                _animationController = AnimationController(
-                        vsync: this,
-                        duration: Duration(milliseconds: 600),
-                )
+                _animationController = AnimationController(vsync: this, duration: Duration(milliseconds: 600),)
                         ..addListener(() => setState(() {}));
-                _animation = CurvedAnimation(
-                        parent: _animationController,
-                        curve: Curves.easeInOut,
-                );
+                _animation = CurvedAnimation(parent: _animationController, curve: Curves.easeInOut);
                 _animationController.forward();
         }
         
@@ -172,7 +166,7 @@ class _DigitalClockState extends State<DigitalClock>
                 largeStyle = TextStyle(
                         color: colors[_Element.text],
                         fontFamily: 'DaysOne',
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w500,
                         fontSize: fontSize,
                         shadows: [
                                 Shadow(
@@ -244,14 +238,14 @@ class _DigitalClockState extends State<DigitalClock>
                                          Container(
                                                   width: 70,
                                                   margin: EdgeInsets.only(left: 10),
-                                            child: Column(
+                                                child: Column(
                                                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                                                     children: <Widget>[
                                                     isNewSecond
                                                         ? ScaleAnimation(_animation,_second,smallStyle)
                                                         : Text(_second, style: smallStyle,),
                                                     Text(_AM_PM, style: smallStyle,),
-                                            ],
+                                                ],
                                           ),
                                         )
                                 ],
@@ -281,13 +275,6 @@ class _DigitalClockState extends State<DigitalClock>
         var colorIndex = 0;
         final    darkColorList = [
                 [
-                        Color(0xff450822),
-                        Colors.pink[900],
-                        Colors.pink[800],
-                        Colors.pink[600],
-                        Colors.pink[400],
-                ],
-                [
                         Color(0xff2f3278),
                         Color(0xff8f94fb),
                 ],
@@ -295,14 +282,16 @@ class _DigitalClockState extends State<DigitalClock>
                         Color(0xff004c56),
                         Color(0xff002e34),
                 ],
+                [
+                        Color(0xff450822),
+                        Colors.pink[900],
+                        Colors.pink[800],
+                        Colors.pink[600],
+                        Colors.pink[400],
+                ],
                
         ];
         final colorList = [
-                [
-                        Colors.pink[800],
-                        Colors.pink[600],
-                        Colors.deepOrange[200],
-                ],
                 [
                         Color(0xff4e54c8),
                         Color(0xff8f94fb),
@@ -311,7 +300,11 @@ class _DigitalClockState extends State<DigitalClock>
                         Color(0xff004c56),
                         Color(0xff002e34),
                 ],
-               
+                [
+                        Colors.pink[800],
+                        Colors.pink[600],
+                        Colors.deepOrange[200],
+                ],
                
         ];
 }

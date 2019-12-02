@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class CurveClipPath extends StatelessWidget {
         final height;
         final List<Color> colors;
+        
         CurveClipPath({
                 @required this.height,
                 @required this.colors,
@@ -11,28 +12,29 @@ class CurveClipPath extends StatelessWidget {
         @override
         Widget build(BuildContext context) {
                 return Container(
-                    height: height,
-                    child:CustomPaint(
-                        painter: _ClipShadowPainter(
-                                clipper: RoundedClipper(),
-                                shadow: Shadow(blurRadius: 30),
+                        height: height,
+                        child: CustomPaint(
+                                painter: _ClipShadowPainter(
+                                        clipper: RoundedClipper(),
+                                        shadow: Shadow(blurRadius: 30),
+                                ),
+                                child: ClipPath(
+                                        clipper: RoundedClipper(),
+                                        child: Container(
+                                                decoration: BoxDecoration(
+                                                        // Box decoration takes a gradient
+                                                        gradient: LinearGradient(
+                                                                // Where the linear gradient begins and ends
+                                                                begin: Alignment.topLeft,
+                                                                end: Alignment.bottomRight,
+                                                                colors: colors,
+                                                                // Colors are easy thanks to Flutter's Colors class.
+                                                        ),
+                                                ),
+                                        ),
+                                ),
                         ),
-                        child: ClipPath(
-                            clipper: RoundedClipper(),
-                            child: Container(
-                                    decoration: BoxDecoration(
-                                            // Box decoration takes a gradient
-                                            gradient: LinearGradient(
-                                                    // Where the linear gradient begins and ends
-                                                    begin: Alignment.topLeft,
-                                                    end: Alignment.bottomRight,
-                                                    // Add one stop for each color. Stops should increase from 0 to 1
-                                                    colors:colors,
-                                                    // Colors are easy thanks to Flutter's Colors class.
-                                            ),
-                                    ),
-                            )),
-                ),);
+                );
         }
 }
 
@@ -60,8 +62,7 @@ class RoundedClipper extends CustomClipper<Path> {
         Path getClip(Size size) {
                 var path = Path();
                 path.lineTo(0.0, size.height - 100);
-                path.quadraticBezierTo(
-                    size.width / 2, size.height, size.width, size.height - 100);
+                path.quadraticBezierTo(size.width / 2, size.height, size.width, size.height - 100);
                 path.lineTo(size.width, 0.0);
                 path.close();
                 return path;
