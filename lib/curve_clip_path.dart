@@ -16,7 +16,9 @@ class CurveClipPath extends StatelessWidget {
                         child: CustomPaint(
                                 painter: _ClipShadowPainter(
                                         clipper: RoundedClipper(),
-                                        shadow: Shadow(blurRadius: 30),
+                                        shadow: BoxShadow(blurRadius: 30,spreadRadius: 5,
+                                            offset: Offset(0, 5),
+                                            color: Colors.black),
                                 ),
                                 child: ClipPath(
                                         clipper: RoundedClipper(),

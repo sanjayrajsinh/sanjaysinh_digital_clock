@@ -154,7 +154,7 @@ class _DigitalClockState extends State<DigitalClock>
                         DeviceOrientation.landscapeRight,
                 ]);
                 if (Theme.of(context).brightness == Brightness.light) {
-                        colorIndex = 0;
+                        colorIndex = 3;
                 } else {
                         colorIndex = 1;
                 }
@@ -188,7 +188,7 @@ class _DigitalClockState extends State<DigitalClock>
                         color: colors[_Element.text],
                         fontFamily: 'DaysOne',
                         fontSize: fontSize /3.5,
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         shadows: [
                                 Shadow(
                                         blurRadius: 12,
@@ -206,7 +206,7 @@ class _DigitalClockState extends State<DigitalClock>
                         decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
                                 boxShadow: [
-                                        BoxShadow(blurRadius: 20,
+                                        BoxShadow(blurRadius: 20,spreadRadius: 5,
                                             offset: Offset(0, 5),
                                             color: Colors.black)
                                 ],
@@ -271,6 +271,10 @@ class _DigitalClockState extends State<DigitalClock>
         var colorIndex = 0;
         final    darkColorList = [
                 [
+                        Color(0xffc25a7d),
+                        Color(0xffff9472),
+                ],
+                [
                         Color(0xff2f3278),
                         Color(0xff8f94fb),
                 ],
@@ -288,6 +292,10 @@ class _DigitalClockState extends State<DigitalClock>
                
         ];
         final colorList = [
+                [
+                        Color(0xfff2709c),
+                        Color(0xffff9472),
+                ],
                 [
                         Color(0xff4e54c8),
                         Color(0xff8f94fb),
