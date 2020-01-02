@@ -128,7 +128,7 @@ class _ClockWidgetState extends State<ClockWidget>
                 children: <Widget>[
                   _buildHour(),
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
+                    padding: const EdgeInsets.only(bottom: 10,left: 5,right:5),
                     child: Text(":", style: widget.largeStyle),
                   ),
                   _buildMinute(),
