@@ -64,6 +64,7 @@ class _ClockWidgetState extends State<ClockWidget>
       _hour = newHour;
       _AM_PM = DateFormat('aa').format(_dateTime);
       isHourChange = true;
+      _runAnimation();
     } else {
       isHourChange = false;
     }
